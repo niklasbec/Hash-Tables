@@ -7,22 +7,22 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
+        self.capacity = 2**64
 
 
 class HashTable:
-    """
-    A hash table that with `capacity` buckets
-    that accepts string keys
-
-    Implement this.
-    """
-
+    
     def fnv1(self, key):
-        """
-        FNV-1 64-bit hash function
-
-        Implement this, and/or DJB2.
-        """
+        FNV_offset_basis = 0xcbf29ce484222325
+        FNV_prime = 0x100000001b3
+        hash = FNV_offset_basis
+        max = 2**64
+        listOfBytes = []
+        for char in key:
+            listOfBytes.append(int(bin(ord(char)), 2))
+            hash = hash ^ int(bin(ord(char)), 2)
+            hash = hash * FNV_prime % max
+        return hex(hash)
 
     def djb2(self, key):
         """
@@ -36,8 +36,8 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+    
 
     def put(self, key, value):
         """
