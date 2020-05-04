@@ -2,7 +2,7 @@
 
 * [Why do I need to know how a Hash Table works?](#q100)
 * [What's the difference between a HashTable and a Dictionary?](#q101)
-* [What's the difference between a HashTable and a Set/HashSet?](#q102)
+* [dWhat's the difference between a HashTable and a Set/HashSet?](#q102)
 * [What's the difference between a HashTable and a HashMap?](#q103)
 * [What's the difference between a HashTable and an Object (JavaScript)?](#q104)
 * [What's the difference between a HashTable and a Cache?](#q105)
