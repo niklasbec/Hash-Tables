@@ -3,24 +3,25 @@ class HashTableEntry:
     Hash Table entry, as a linked list node.
     """
 
-    def __init__(self, key, value):
+    def __init__(self, key, value, capacity, next):
         self.key = key
         self.value = value
         self.next = None
-        self.capacity = 2**64
+        self.capacity = capacity
 
 
 class HashTable:
+
+    def __init__(self):
+        
     
     def fnv1(self, key):
         FNV_offset_basis = 0xcbf29ce484222325
         FNV_prime = 0x100000001b3
         hash = FNV_offset_basis
         max = 2**64
-        listOfBytes = []
         for char in key:
-            listOfBytes.append(int(bin(ord(char)), 2))
-            hash = hash ^ int(bin(ord(char)), 2)
+            hash = hash ^ ord(char)
             hash = hash * FNV_prime % max
         return hex(hash)
 
@@ -47,6 +48,22 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        if self.storage[index]:
+            curr = self.storage[index]
+            while curr:
+                if curr.key == key:
+                    curr.value = value
+                    return
+                if curr.next == None:
+                    curr.next = HashTableEntry(key, value)
+                    return
+                curr = curr.next
+
+            curr.next = HashTableEntry(key, value)
+        else:
+            self.storage[index] = HashTableEntry(key, value)
+
 
     def delete(self, key):
         """
@@ -56,6 +73,7 @@ class HashTable:
 
         Implement this.
         """
+        self.storage[self.hash_index(key)] == None
 
     def get(self, key):
         """
@@ -65,6 +83,16 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        if self.storage[index]:
+            if self.storage[index].next:
+                curr = self.storage[index]
+                while curr.key != key:
+                    curr = curr.next
+                return curr.value
+            else:
+                return self.storage[index].value
+        return None
 
     def resize(self):
         """
