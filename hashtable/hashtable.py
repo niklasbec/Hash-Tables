@@ -3,17 +3,17 @@ class HashTableEntry:
     Hash Table entry, as a linked list node.
     """
 
-    def __init__(self, key, value, capacity, next):
+    def __init__(self, key, value, capacity=10):
         self.key = key
         self.value = value
         self.next = None
         self.capacity = capacity
 
-
 class HashTable:
 
-    def __init__(self):
-        
+    def __init__(self, capacity, ):
+        self.capacity = capacity
+        self.storage = [None] * capacity
     
     def fnv1(self, key):
         FNV_offset_basis = 0xcbf29ce484222325
@@ -37,7 +37,7 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        return self.fnv1(key) % self.capacity
+        return int(self.fnv1(key), 16) % self.capacity
     
 
     def put(self, key, value):
@@ -66,14 +66,15 @@ class HashTable:
 
 
     def delete(self, key):
-        """
-        Remove the value stored with the given key.
-
-        Print a warning if the key is not found.
-
-        Implement this.
-        """
-        self.storage[self.hash_index(key)] == None
+        hashIndex = self.hash_index(key)
+        
+        #check if single value then delete
+        if self.storage[hashIndex].next == None:
+            if self.storage[hashIndex].key == key:
+                self.storage[hashIndex] = None
+            else:
+                errorMessage = "WARNING -- KEY NOT FOUND"
+                print(errorMessage)
 
     def get(self, key):
         """
@@ -95,12 +96,20 @@ class HashTable:
         return None
 
     def resize(self):
-        """
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
+        self.capacity = self.capacity * 2
+        newList = self.capacity * [None]
 
-        Implement this.
-        """
+        for a, b in enumerate(self.storage):
+            while b:
+                hashIndex = self.hash_index(b.key)
+                if newList[hashIndex]:
+                    curr = newList[hashIndex]
+                    while curr.next:
+                        curr = curr.next
+                    curr.next = HashTableEntry(b.key, b.value)
+                else:
+                    newList[hashIndex] = HashTableEntry(b.key, b.value)
+                b = b.next
 
 if __name__ == "__main__":
     ht = HashTable(2)
