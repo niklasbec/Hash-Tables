@@ -3,26 +3,27 @@ class HashTableEntry:
     Hash Table entry, as a linked list node.
     """
 
-    def __init__(self, key, value):
+    def __init__(self, key, value, capacity=10):
         self.key = key
         self.value = value
         self.next = None
-
+        self.capacity = capacity
 
 class HashTable:
-    """
-    A hash table that with `capacity` buckets
-    that accepts string keys
 
-    Implement this.
-    """
-
+    def __init__(self, capacity, ):
+        self.capacity = capacity
+        self.storage = [None] * capacity
+    
     def fnv1(self, key):
-        """
-        FNV-1 64-bit hash function
-
-        Implement this, and/or DJB2.
-        """
+        FNV_offset_basis = 0xcbf29ce484222325
+        FNV_prime = 0x100000001b3
+        hash = FNV_offset_basis
+        max = 2**64
+        for char in key:
+            hash = hash ^ ord(char)
+            hash = hash * FNV_prime % max
+        return hex(hash)
 
     def djb2(self, key):
         """
@@ -36,8 +37,8 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return int(self.fnv1(key), 16) % self.capacity
+    
 
     def put(self, key, value):
         """
@@ -47,15 +48,38 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        if self.storage[index]:
+            curr = self.storage[index]
+            while curr:
+                if curr.key == key:
+                    curr.value = value
+                    return
+                if curr.next == None:
+                    curr.next = HashTableEntry(key, value)
+                    return
+                curr = curr.next
+
+            curr.next = HashTableEntry(key, value)
+        else:
+            self.storage[index] = HashTableEntry(key, value)
+
 
     def delete(self, key):
-        """
-        Remove the value stored with the given key.
-
-        Print a warning if the key is not found.
-
-        Implement this.
-        """
+        hashIndex = self.hash_index(key)
+        
+        #check if single value then delete
+        if self.storage[hashIndex].next == None:
+            if self.storage[hashIndex].key == key:
+                self.storage[hashIndex] = None
+            else:
+                errorMessage = "WARNING -- KEY NOT FOUND"
+                print(errorMessage)
+        else:
+            if self.storage[hashIndex].key == key:
+                self.storage[hashIndex] = None
+            else:
+                self.storage[hashIndex].next = None
 
     def get(self, key):
         """
@@ -65,14 +89,34 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        if self.storage[index]:
+            if self.storage[index].next:
+                curr = self.storage[index]
+                while curr.key != key:
+                    curr = curr.next
+                return curr.value
+            else:
+                return self.storage[index].value
+        return None
 
     def resize(self):
-        """
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
+        self.capacity = self.capacity * 2
+        newList = self.capacity * [None]
 
-        Implement this.
-        """
+        for a, b in enumerate(self.storage):
+            while b:
+                hashIndex = self.hash_index(b.key)
+                if newList[hashIndex]:
+                    curr = newList[hashIndex]
+                    while curr.next:
+                        curr = curr.next
+                    curr.next = HashTableEntry(b.key, b.value)
+                else:
+                    newList[hashIndex] = HashTableEntry(b.key, b.value)
+                b = b.next
+        self.storage = newList
+
 
 if __name__ == "__main__":
     ht = HashTable(2)
