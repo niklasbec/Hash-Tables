@@ -75,6 +75,11 @@ class HashTable:
             else:
                 errorMessage = "WARNING -- KEY NOT FOUND"
                 print(errorMessage)
+        else:
+            if self.storage[hashIndex].key == key:
+                self.storage[hashIndex] = None
+            else:
+                self.storage[hashIndex].next = None
 
     def get(self, key):
         """
@@ -110,6 +115,8 @@ class HashTable:
                 else:
                     newList[hashIndex] = HashTableEntry(b.key, b.value)
                 b = b.next
+        self.storage = newList
+
 
 if __name__ == "__main__":
     ht = HashTable(2)
